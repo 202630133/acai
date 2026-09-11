@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘 뭐 먹지? | 저녁 메뉴 추천</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .header-tag {
+            display: inline-block;
+            background: #ffe0e3;
+            color: #ff4757;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            color: #2f3542;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            color: #747d8c;
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        /* 카드 영역 */
+        .card-box {
+            background: #f8f9fa;
+            border: 2px dashed #dfe4ea;
+            border-radius: 20px;
+            padding: 35px 20px;
+            margin-bottom: 28px;
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card-box.active {
+            border-color: #ff4757;
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.08);
+        }
+
+        .emoji {
+            font-size: 80px;
+            line-height: 1;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .food-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2f3542;
+            margin-bottom: 6px;
+        }
+
+        .food-desc {
+            font-size: 14px;
+            color: #ff4757;
+            font-weight: 600;
+        }
+
+        /* 버튼 */
+        .btn-recommend {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 16px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .btn-recommend:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-recommend:active {
+            transform: translateY(1px);
+            box-shadow: 0 6px 12px rgba(255, 71, 87, 0.25);
+        }
+
+        /* 애니메이션 효과 */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        .bounce {
+            animation: bounce 0.4s ease infinite;
+        }
+
+        .pop-in {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="header-tag">✨ 오늘 뭐 먹지?</span>
+        <h1>저녁 메뉴 추천</h1>
+        <p class="subtitle">버튼을 눌러 오늘 저녁 메뉴를 정해보세요!</p>
+
+        <div class="card-box" id="cardBox">
+            <div class="emoji" id="emojiDisplay">🍽️</div>
+            <div class="food-name" id="foodName">무엇을 먹을까요?</div>
+            <div class="food-desc" id="foodDesc">아래 버튼을 눌러보세요!</div>
+        </div>
+
+        <button class="btn-recommend" id="recommendBtn" onclick="getRecommendation()">
+            🎲 저녁 메뉴 추천받기
+        </button>
+    </div>
+
+    <script>
+        const menuList = [
+            { name: "삼겹살", emoji: "🥓", desc: "지글지글 고소한 쌈 채소와의 조화!" },
+            { name: "치킨", emoji: "🍗", desc: "오늘 밤은 겉바속촉 치맥 어때요?" },
+            { name: "피자", emoji: "🍕", desc: "쭉 늘어나는 치즈의 행복!" },
+            { name: "초밥", emoji: "🍣", desc: "깔끔하고 고급스러운 한 끼 선택!" },
+            { name: "떡볶이", emoji: "🍡", desc: "매콤달콤 국민 간식이자 최고의 저녁!" },
+            { name: "짜장면", emoji: "🍜", desc: "단짝친구 탕수육도 잊지 마세요!" },
+            { name: "햄버거", emoji: "🍔", desc: "빠르고 완벽하게 즐기는 수제버거!" },
+            { name: "돈까스", emoji: "🥩", desc: "바삭바삭한 식감의 최고봉!" },
+            { name: "김치찌개", emoji: "🍲", desc: "칼칼하고 깊은 국물이 당길 때!" },
+            { name: "파스타", emoji: "🍝", desc: "크림인가 토마토인가 그것이 문제로다!" },
+            { name: "족발/보쌈", emoji: "🍖", desc: "야식 겸 저녁으로 최고의 선택!" },
+            { name: "마라탕", emoji: "🌶️", desc: "알싸한 매운맛 중독의 세계로!" },
+            { name: "쌀국수", emoji: "🍜", desc: "따뜻하고 시원한 국물 한 그릇!" },
+            { name: "곱창", emoji: "🥘", desc: "쫄깃하고 고소한 곱창 구이!" },
+            { name: "카레", emoji: "🍛", desc: "진하고 부드러운 일상속의 별미!" }
+        ];
+
+        let isRolling = false;
+
+        function getRecommendation() {
+            if (isRolling) return;
+            isRolling = true;
+
+            const emojiDisplay = document.getElementById("emojiDisplay");
+            const foodName = document.getElementById("foodName");
+            const foodDesc = document.getElementById("foodDesc");
+            const cardBox = document.getElementById("cardBox");
+            const btn = document.getElementById("recommendBtn");
+
+            btn.disabled = true;
+            btn.innerText = "🤔 생각 중...";
+            cardBox.classList.add("active");
+            emojiDisplay.classList.add("bounce");
+
+            let count = 0;
+            const maxCount = 15;
+            
+            // 더돌아가는 효과 (랜덤 셔플 효과)
+            const interval = setInterval(() => {
+                const tempIndex = Math.floor(Math.random() * menuList.length);
+                emojiDisplay.innerText = menuList[tempIndex].emoji;
+                foodName.innerText = menuList[tempIndex].name;
+                foodDesc.innerText = "추천 중...";
+                count++;
+
+                if (count >= maxCount) {
+                    clearInterval(interval);
+                    
+                    // 최종 선택
+                    const finalIndex = Math.floor(Math.random() * menuList.length);
+                    const selected = menuList[finalIndex];
+
+                    emojiDisplay.classList.remove("bounce");
+                    emojiDisplay.classList.add("pop-in");
+                    
+                    emojiDisplay.innerText = selected.emoji;
+                    foodName.innerText = selected.name;
+                    foodDesc.innerText = selected.desc;
+
+                    btn.disabled = false;
+                    btn.innerText = "🎲 다른 메뉴 추천받기";
+                    isRolling = false;
+
+                    setTimeout(() => {
+                        emojiDisplay.classList.remove("pop-in");
+                    }, 300);
+                }
+            }, 80);
+        }
+    </script>
+</body>
+</html>
